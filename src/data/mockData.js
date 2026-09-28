@@ -63,6 +63,40 @@ export const MOCK_LISTINGS = [
     sellerId: 'user_103',
     sellerName: 'Deepak S',
     createdAt: '2026-09-25T09:00:00Z'
+  },
+  {
+    id: 'b4',
+    title: 'Engineering Mathematics Sem 1 Notes & Guide',
+    author: 'T. Veerarajan',
+    publisher: 'McGraw Hill',
+    category: 'Engineering & Tech',
+    condition: 'like_new',
+    mrp: 350,
+    price: 120,
+    description: 'Clean reference guide with practice problem sets for 1st year engineering.',
+    locality: 'Peelamedu',
+    photoUrls: [],
+    status: 'available',
+    sellerId: 'user_104',
+    sellerName: 'Siddharth M',
+    createdAt: '2026-09-26T14:00:00Z'
+  },
+  {
+    id: 'b5',
+    title: 'Quantitative Aptitude for Competitive Exams',
+    author: 'R.S. Aggarwal',
+    publisher: 'S. Chand',
+    category: 'Competitive Exams',
+    condition: 'good',
+    mrp: 650,
+    price: 140,
+    description: 'Essential guide for campus placements and bank exams. Neat condition.',
+    locality: 'Saravanampatti',
+    photoUrls: [],
+    status: 'available',
+    sellerId: 'user_105',
+    sellerName: 'Priya N',
+    createdAt: '2026-09-27T08:30:00Z'
   }
 ];
 

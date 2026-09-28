@@ -179,3 +179,408 @@ a {
   color: var(--color-quiet-grey);
   margin-bottom: var(--space-lg);
 }
+
+/* ==========================================================================
+   BROWSE PAGE STYLES
+   ========================================================================== */
+
+.browse-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* 1. Search Bar */
+.search-container {
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 1rem;
+  color: var(--color-quiet-grey);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 36px 12px 40px;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.search-input::placeholder {
+  color: var(--color-quiet-grey);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--color-quiet-grey);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* 2. Quick Filter Chips */
+.chips-container {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.chips-container::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  white-space: nowrap;
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  border: 2px solid var(--color-ink);
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+  background-color: var(--color-light-grey);
+}
+
+.filter-chip.active {
+  background-color: var(--color-teal);
+  color: var(--color-surface);
+  border-color: var(--color-teal);
+}
+
+/* 3. Bazaar Banner */
+.bazaar-banner {
+  background-color: var(--color-marigold);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.banner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-ink);
+  color: var(--color-surface);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.banner-headline {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+
+.banner-subtext {
+  font-size: 0.9rem;
+  color: var(--color-ink);
+  opacity: 0.9;
+}
+
+.banner-btn {
+  margin-top: var(--space-xs);
+  border: 2px solid var(--color-ink) !important;
+}
+
+/* 4. Shelf Rows & Cards */
+.shelves-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.shelf-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.shelf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.shelf-eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-teal);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.shelf-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  color: var(--color-ink);
+}
+
+.shelf-see-all {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-teal);
+  white-space: nowrap;
+}
+
+/* Shelf Container: Horizontal Scroll on Mobile, Grid on Desktop (860px+) */
+.shelf-container {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 860px) {
+  .shelf-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+}
+
+/* Book Card Styling */
+.book-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 860px) {
+  .book-card-link {
+    flex: initial;
+  }
+}
+
+.book-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.book-card-photo-wrapper {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  background-color: var(--color-light-grey);
+}
+
+.book-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-quiet-grey);
+}
+
+.book-card-placeholder-icon {
+  font-size: 2rem;
+}
+
+.book-card-placeholder-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.book-card-badge-top-left {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+.book-card-distance-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-ink);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+}
+
+.book-card-details {
+  padding: var(--space-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.book-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: 2px;
+  line-height: 1.25;
+}
+
+.book-card-author {
+  font-size: 0.85rem;
+  color: var(--color-quiet-grey);
+  margin-bottom: var(--space-md);
+}
+
+.book-card-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.book-card-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.book-card-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-teal);
+}
+
+.book-card-mrp {
+  font-size: 0.8rem;
+  color: var(--color-quiet-grey);
+  text-decoration: line-through;
+}
+
+.book-card-locality {
+  font-size: 0.75rem;
+  color: var(--color-quiet-grey);
+}
+
+/* Skeleton Loading State */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.skeleton-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-line);
+  height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 140px;
+  background-color: var(--color-light-grey);
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-title {
+  width: 75%;
+  height: 16px;
+  background-color: var(--color-light-grey);
+  border-radius: 4px;
+}
+
+.skeleton-author {
+  width: 45%;
+  height: 12px;
+  background-color: var(--color-light-grey);
+  border-radius: 4px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Error Container */
+.error-container {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-condition-well-read);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.error-message {
+  color: var(--color-condition-well-read);
+  font-weight: 600;
+}

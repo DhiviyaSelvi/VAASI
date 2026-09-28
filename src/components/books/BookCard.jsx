@@ -2,55 +2,51 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ConditionBadge from './ConditionBadge';
 
-export default function BookCard({ listing }) {
+export default function BookCard({ listing, distance = '1.2 km' }) {
   if (!listing) return null;
 
+  const hasPhoto = listing.photoUrls && listing.photoUrls.length > 0 && listing.photoUrls[0];
+
   return (
-    <Link to={`/book/${listing.id}`} style={{ display: 'block', textDecoration: 'none' }}>
-      <div style={{
-        backgroundColor: 'var(--color-surface)',
-        borderRadius: 'var(--radius-md)',
-        overflow: 'hidden',
-        border: '1px solid var(--color-line)',
-        boxShadow: 'var(--shadow-sm)',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <div style={{ position: 'relative', width: '100%', height: '180px', backgroundColor: 'var(--color-light-grey)' }}>
-          <img
-            src={listing.photoUrls?.[0] || 'https://placehold.co/400x500/1F5C56/FFFFFF?text=Book'}
-            alt={listing.title}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-          <div style={{ position: 'absolute', top: '8px', right: '8px' }}>
+    <Link to={`/book/${listing.id}`} className="book-card-link">
+      <div className="book-card">
+        <div className="book-card-photo-wrapper">
+          {hasPhoto ? (
+            <img
+              src={listing.photoUrls[0]}
+              alt={listing.title}
+              className="book-card-image"
+            />
+          ) : (
+            <div className="book-card-placeholder">
+              <span className="book-card-placeholder-icon">📖</span>
+              <span className="book-card-placeholder-text">Secondhand Book</span>
+            </div>
+          )}
+
+          <div className="book-card-badge-top-left">
             <ConditionBadge conditionKey={listing.condition} />
           </div>
+
+          {distance && (
+            <div className="book-card-distance-badge">
+              {distance}
+            </div>
+          )}
         </div>
 
-        <div style={{ padding: 'var(--space-md)', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <h4 style={{ fontSize: '1.05rem', color: 'var(--color-ink)', marginBottom: '4px', lineHeight: '1.3' }}>
-            {listing.title}
-          </h4>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-quiet-grey)', marginBottom: 'var(--space-sm)' }}>
-            by {listing.author}
-          </p>
+        <div className="book-card-details">
+          <h4 className="book-card-title">{listing.title}</h4>
+          <p className="book-card-author">by {listing.author}</p>
 
-          <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div>
-              <span style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--color-teal)' }}>
-                ₹{listing.price}
-              </span>
+          <div className="book-card-footer">
+            <div className="book-card-pricing">
+              <span className="book-card-price">₹{listing.price}</span>
               {listing.mrp && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--color-quiet-grey)', textDecoration: 'line-through', marginLeft: '6px' }}>
-                  ₹{listing.mrp}
-                </span>
+                <span className="book-card-mrp">₹{listing.mrp}</span>
               )}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-quiet-grey)' }}>
-              📍 {listing.locality}
-            </span>
+            <span className="book-card-locality">📍 {listing.locality}</span>
           </div>
         </div>
       </div>
