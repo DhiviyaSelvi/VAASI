@@ -8,13 +8,15 @@ import Button from '../components/common/Button';
 export default function Browse() {
   const { listings, loading, error, refetch, toggleForceError, isForcedError } = useListings();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Feature 1: No filter chip is active by default
   const [activeChip, setActiveChip] = useState(null);
 
-  // Filter chips definitions
   const CHIPS = [
     { id: 'under150', label: 'Under ₹150' },
     { id: 'likeNew', label: 'Like New' },
-    { id: 'textbooks', label: 'College Textbooks' }
+    { id: 'textbooks', label: 'College Textbooks' },
+    { id: 'tamil', label: 'Tamil Literature' } // Feature 4: Tamil Literature chip
   ];
 
   const handleChipClick = (chipId) => {
@@ -39,13 +41,15 @@ export default function Browse() {
         if (item.condition !== 'like_new') return false;
       } else if (activeChip === 'textbooks') {
         if (item.category !== 'Academic & Textbooks' && item.category !== 'Engineering & Tech') return false;
+      } else if (activeChip === 'tamil') {
+        if (item.category !== 'Tamil Literature') return false;
       }
 
       return true;
     });
   }, [listings, searchQuery, activeChip]);
 
-  // Group listings into specified shelves
+  // Feature 3: Categorized shelves + Non-Fiction & Self-Help + More Books fallback
   const collegeListings = useMemo(() => {
     return filteredListings.filter(
       (item) => item.category === 'Academic & Textbooks' || item.category === 'Engineering & Tech'
@@ -66,7 +70,7 @@ export default function Browse() {
     return filteredListings.filter((item) => item.category === 'Non-Fiction & Self-Help');
   }, [filteredListings]);
 
-  // Fallback "More Books" shelf for unmapped/other categories
+  // Fallback "More Books" shelf for any unmapped category so no book disappears
   const mappedIds = useMemo(() => {
     const ids = new Set();
     [...collegeListings, ...fictionListings, ...competitiveListings, ...nonFictionListings].forEach((item) => {
@@ -80,19 +84,20 @@ export default function Browse() {
   }, [filteredListings, mappedIds]);
 
   return (
-    <div className="browse-page">
+    <div className="wrap">
       {/* Dev Mode Debug Error Toggle */}
       {import.meta.env.DEV && (
-        <div style={{ marginBottom: 'var(--space-sm)', textAlign: 'right' }}>
+        <div style={{ margin: '8px 0', textAlign: 'right' }}>
           <button
             onClick={toggleForceError}
             style={{
               padding: '4px 10px',
-              fontSize: '0.75rem',
-              backgroundColor: isForcedError ? 'red' : 'var(--color-quiet-grey)',
+              fontSize: '11px',
+              fontWeight: '700',
+              backgroundColor: isForcedError ? '#EF4444' : 'var(--ink-quiet)',
               color: 'white',
-              border: 'none',
-              borderRadius: 'var(--radius-sm)',
+              border: '1.5px solid var(--ink)',
+              borderRadius: '2px',
               cursor: 'pointer'
             }}
           >
@@ -101,33 +106,41 @@ export default function Browse() {
         </div>
       )}
 
-      {/* 1. Search Bar */}
-      <div className="search-container">
-        <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search books, authors, semesters (e.g. Engineering Maths)"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="search-clear-btn" onClick={() => setSearchQuery('')}>
-              ✕
-            </button>
-          )}
-        </div>
+      {/* SEARCH BAR */}
+      <div className="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3.5-3.5" />
+        </svg>
+        <input
+          type="search"
+          placeholder="Search books, authors, semesters (e.g. Engineering Maths)"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery ? (
+          <button className="filter-btn" onClick={() => setSearchQuery('')} aria-label="Clear Search">
+            ✕
+          </button>
+        ) : (
+          <button className="filter-btn" aria-label="Filters">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+              <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />
+              <circle cx="16" cy="7" r="2" />
+              <circle cx="8" cy="17" r="2" />
+            </svg>
+          </button>
+        )}
       </div>
 
-      {/* 2. Quick Filter Chips */}
-      <div className="chips-container">
+      {/* FILTER CHIPS */}
+      <div className="chips">
         {CHIPS.map((chip) => {
           const isActive = activeChip === chip.id;
           return (
             <button
               key={chip.id}
-              className={`filter-chip ${isActive ? 'active' : ''}`}
+              className={`chip ${isActive ? 'active' : ''}`}
               onClick={() => handleChipClick(chip.id)}
             >
               {chip.label}
@@ -136,25 +149,33 @@ export default function Browse() {
         })}
       </div>
 
-      {/* 3. Bazaar Banner */}
-      <div className="bazaar-banner">
-        <div className="banner-tag">
-          🔒 COIMBATORE BAZAAR
-        </div>
-        <h2 className="banner-headline">
-          New listings added daily from Peelamedu and RS Puram.
-        </h2>
-        <p className="banner-subtext">
-          Direct student-to-student handover
-        </p>
-        <Link to="/sell" style={{ textDecoration: 'none' }}>
-          <Button variant="secondary" className="banner-btn">
-            Post Your Old Books
-          </Button>
-        </Link>
-      </div>
+      {/* BAZAAR BANNER */}
+      <section className="banner">
+        <span className="banner-tag">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <path d="M3 10l9-6 9 6v10H3z" />
+          </svg>
+          COIMBATORE BAZAAR LIVE
+        </span>
+        <h2>New listings added daily from Peelamedu and RS Puram.</h2>
+        <p className="banner-places">PSG Tech • CIT • Peelamedu • R.S. Puram Pavements</p>
 
-      {/* States Handling */}
+        <div className="book-stack" aria-hidden="true">
+          <div className="stack-book sb1">Sapiens<span className="price">₹180</span></div>
+          <div className="stack-book sb2">HIGHER ENGG<br />B.S. GREWAL<span className="price">₹280</span></div>
+          <div className="stack-book sb3">பொன்னியின் செல்வன்<span className="price">₹450</span></div>
+          <div className="stack-book sb4">PHYSICS<br />H.C. Verma<span className="price">₹320</span></div>
+        </div>
+
+        <div className="banner-foot">
+          <span>Direct student-to-student handover</span>
+          <Link to="/sell" style={{ textDecoration: 'none' }}>
+            <button className="banner-btn">Post Your Old Books</button>
+          </Link>
+        </div>
+      </section>
+
+      {/* STATES HANDLING */}
       {loading && (
         <div className="skeleton-grid">
           {[1, 2, 3, 4].map((n) => (
@@ -184,33 +205,33 @@ export default function Browse() {
       )}
 
       {!loading && !error && filteredListings.length > 0 && (
-        <div className="shelves-wrapper">
+        <>
           <ShelfRow
-            eyebrow="ENGINEERING • MEDICINE • ARTS"
+            eyebrow="Engineering • Medicine • Arts"
             title="College Books & Textbooks"
             listings={collegeListings}
           />
           <ShelfRow
-            eyebrow="PAPERBACKS & TAMIL PROSE"
+            eyebrow="Paperbacks & Tamil Prose"
             title="Novels & Fiction"
             listings={fictionListings}
           />
           <ShelfRow
-            eyebrow="PLACEMENTS & ENTRANCE"
+            eyebrow="Placements & Entrance"
             title="Competitive Exams"
             listings={competitiveListings}
           />
           <ShelfRow
-            eyebrow="SELF IMPROVEMENT & INSIGHTS"
+            eyebrow="Self Improvement & Insights"
             title="Non-Fiction & Self-Help"
             listings={nonFictionListings}
           />
           <ShelfRow
-            eyebrow="OTHER GENRES"
+            eyebrow="Other Genres"
             title="More Books"
             listings={moreListings}
           />
-        </div>
+        </>
       )}
     </div>
   );

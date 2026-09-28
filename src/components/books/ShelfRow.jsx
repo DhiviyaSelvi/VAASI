@@ -7,16 +7,16 @@ export default function ShelfRow({ eyebrow, title, listings = [] }) {
   }
 
   return (
-    <section className="shelf-section">
-      <div className="shelf-header">
+    <section className="shelf">
+      <div className="shelf-head">
         <div>
-          {eyebrow && <span className="shelf-eyebrow">{eyebrow}</span>}
-          <h3 className="shelf-title">{title}</h3>
+          {eyebrow && <div className="eyebrow">{eyebrow}</div>}
+          <h2>{title}</h2>
         </div>
-        <span className="shelf-see-all">See all ({listings.length})</span>
+        <span className="see-all">See all ({listings.length})</span>
       </div>
 
-      <div className="shelf-container">
+      <div className="shelf-row">
         {listings.map((item) => (
           <BookCard key={item.id} listing={item} />
         ))}

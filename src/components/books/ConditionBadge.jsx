@@ -2,20 +2,26 @@ import React from 'react';
 import { CONDITIONS } from '../../data/constants';
 
 export default function ConditionBadge({ conditionKey }) {
-  const cond = CONDITIONS[conditionKey?.toUpperCase()] || { label: conditionKey || 'Good', color: 'var(--color-quiet-grey)' };
+  const normalized = conditionKey?.toLowerCase();
   
+  let modifierClass = '';
+  let label = 'Good';
+
+  if (normalized === 'like_new' || normalized === 'like-new') {
+    modifierClass = 'like-new';
+    label = 'Like New';
+  } else if (normalized === 'well_read' || normalized === 'well-read') {
+    modifierClass = 'well-read';
+    label = 'Well-read';
+  } else if (normalized === 'fair') {
+    label = 'Fair';
+  } else {
+    label = 'Good';
+  }
+
   return (
-    <span style={{
-      display: 'inline-block',
-      padding: '2px 8px',
-      borderRadius: 'var(--radius-sm)',
-      fontSize: '0.75rem',
-      fontWeight: '600',
-      backgroundColor: 'var(--color-light-grey)',
-      color: cond.color,
-      border: `1px solid ${cond.color}`
-    }}>
-      {cond.label}
+    <span className={`cond ${modifierClass}`}>
+      {label}
     </span>
   );
 }

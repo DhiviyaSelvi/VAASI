@@ -1,32 +1,45 @@
 /* Design Tokens for Vaasi Web App */
 :root {
-  /* Brand Colors */
-  --color-teal: #1F5C56;
-  --color-teal-hover: #16433E;
+  /* New tokens from reference HTML */
+  --ink: #1C1E1D;
+  --ink-quiet: #5F6663;
+  --paper: #F7F7F3;
+  --surface: #FFFFFF;
+  --placeholder: #EEEEE8;
+  --teal: #0F5148;
+  --marigold: #FFB547;
+  --line: #1C1E1D;
+  --line-soft: #D5D7CF;
+
+  --font-display: 'Zilla Slab', Georgia, serif;
+  --font-body: 'Work Sans', system-ui, sans-serif;
+
+  --border: 2px solid var(--ink);
+  --shadow-hard: 3px 3px 0 var(--ink);
+  --shadow-hard-lg: 5px 5px 0 var(--ink);
+
+  /* Legacy aliases to prevent breaking other pages (Login, Sell, Chat, Profile, Book Detail) */
+  --color-teal: var(--teal);
+  --color-teal-hover: #0a3d36;
   --color-teal-light: #E7F0EF;
-  --color-marigold: #E8A33D;
-  --color-marigold-hover: #D48E28;
+  --color-marigold: var(--marigold);
+  --color-marigold-hover: #e09b30;
   --color-marigold-light: #FDF5E8;
 
-  /* Neutral Surface & Text Colors */
-  --color-paper: #F5F6F1;
-  --color-surface: #FFFFFF;
-  --color-ink: #1C1E1D;
-  --color-quiet-grey: #6C757D;
-  --color-light-grey: #F0F2EB;
-  --color-line: #D1D5DB;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-quiet-grey: var(--ink-quiet);
+  --color-light-grey: var(--placeholder);
+  --color-line: var(--line-soft);
 
-  /* Condition Badge Colors */
   --color-condition-like-new: #10B981;
   --color-condition-good: #3B82F6;
   --color-condition-fair: #F59E0B;
   --color-condition-well-read: #EF4444;
 
-  /* Typography */
-  --font-heading: 'Zilla Slab', Georgia, serif;
-  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: var(--font-display);
 
-  /* Spacing Scale */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -34,19 +47,16 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* Radius Tokens */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 
-  /* Elevation / Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --shadow-sm: var(--shadow-hard);
+  --shadow-md: var(--shadow-hard);
+  --shadow-lg: var(--shadow-hard-lg);
 
-  /* Layout Boundaries */
-  --max-width-content: 1120px;
+  --max-width-content: 1100px;
   --header-height: 64px;
-  --bottom-nav-height: 60px;
+  --bottom-nav-height: 76px;
 }
