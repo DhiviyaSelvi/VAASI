@@ -1,4 +1,4 @@
-import { MOCK_USER } from '../data/mockData';
+import { MOCK_USER, MOCK_USERS } from '../data/mockData';
 
 const DELAY_MS = 300;
 
@@ -12,6 +12,21 @@ export async function getCurrentUser() {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ ...MOCK_USER });
+    }, DELAY_MS);
+  });
+}
+
+/**
+ * Get user profile by user ID.
+ * 
+ * Firebase implementation plan:
+ * Will fetch doc(db, 'users', userId) from Firestore.
+ */
+export async function getUserById(userId) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const user = MOCK_USERS[userId] || null;
+      resolve(user ? { ...user } : null);
     }, DELAY_MS);
   });
 }

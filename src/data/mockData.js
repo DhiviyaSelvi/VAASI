@@ -12,6 +12,39 @@ export const MOCK_USER = {
   ratingCount: 12
 };
 
+export const MOCK_USERS = {
+  user_101: {
+    id: 'user_101',
+    name: 'Kavitha R',
+    college: 'PSG College of Technology',
+    locality: 'Peelamedu'
+  },
+  user_102: {
+    id: 'user_102',
+    name: 'Karthik R.',
+    yearAndDept: '3rd year Mech', // SAMPLE TEST DATA, not real
+    college: 'PSG College of Technology', // SAMPLE TEST DATA, not real
+    collegeEmailVerified: true, // SAMPLE TEST DATA, not real
+    rating: 4.9, // SAMPLE TEST DATA, not real
+    ratingCount: 18, // SAMPLE TEST DATA, not real
+    avgResponseMins: 15, // SAMPLE TEST DATA, not real
+    fulfilledPercent: 100 // SAMPLE TEST DATA, not real
+  },
+  user_103: {
+    id: 'user_103',
+    name: 'Deepak S'
+    // Minimal seller profile without stats/rating/subline for testing minimal view
+  },
+  user_104: {
+    id: 'user_104',
+    name: 'Siddharth M'
+  },
+  user_105: {
+    id: 'user_105',
+    name: 'Priya N'
+  }
+};
+
 export const MOCK_LISTINGS = [
   {
     id: 'b1',
@@ -41,12 +74,25 @@ export const MOCK_LISTINGS = [
     mrp: 1200,
     price: 750,
     description: 'Complete collector edition set. Read once, crisp pages.',
-    locality: 'RS Puram',
-    photoUrls: [],
+    locality: 'Peelamedu',
+    landmark: 'near PSG Tech Main Gate', // SAMPLE TEST DATA, not real
+    handoffNote: 'Can meet outside PSG Tech gate between 4 PM and 7 PM on weekdays.', // SAMPLE TEST DATA, not real
+    sellerNote: 'Used for 2 semesters. No missing pages or ink stains.', // SAMPLE TEST DATA, not real
+    edition: 'Revised 2021 Print', // SAMPLE TEST DATA, not real
+    pages: '462 (Vol 1) + 450 (Vol 2)', // SAMPLE TEST DATA, not real
+    language: 'English', // SAMPLE TEST DATA, not real
+    extras: 'Handwritten solution set', // SAMPLE TEST DATA, not real
+    photoUrls: ['/sample-book-1.svg', '/sample-book-2.svg'],
     editionNote: '5 Vol Set',
+    checklist: [
+      { label: 'Zero torn pages', status: 'yes' },
+      { label: 'Original binding firm', status: 'yes' },
+      { label: 'No ink markings', status: 'yes' },
+      { label: 'Includes Vol 5 map booklet', status: 'partial' }
+    ],
     status: 'available',
     sellerId: 'user_102',
-    sellerName: 'Arun Kumar',
+    sellerName: 'Karthik R.',
     createdAt: '2026-09-22T14:15:00Z'
   },
   {
