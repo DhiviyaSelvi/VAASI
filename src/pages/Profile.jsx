@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCurrentUser, getUserById } from '../services/authService';
+import { getCurrentUser, getUserById, logoutUser } from '../services/authService';
 import { getListingsBySeller, getPurchasedListings, markSold, updateListingPrice } from '../services/listingsService';
 import { getMeetupInfoForListing } from '../services/chatService';
 import { checkPrice } from '../utils/pricing';
@@ -158,13 +158,24 @@ export default function Profile() {
   return (
     <main className="pf-wrap">
       {/* Dev Switcher for thorough testing */}
-      <div className="pf-dev-user-select">
-        <span>Dev Switch Profile View:</span>
-        <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
-          <option value="user_101">Kavitha R (Active + Sold + Purchases)</option>
-          <option value="user_103">Deepak S (Zero Sales Test - 1 Purchase)</option>
-          <option value="user_105">Priya N (Zero Sales & Zero Purchases Test)</option>
-        </select>
+      <div className="pf-dev-user-select" style={{ justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>Dev Switch Profile View:</span>
+          <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
+            <option value="user_101">Kavitha R (Active + Sold + Purchases)</option>
+            <option value="user_103">Deepak S (Zero Sales Test - 1 Purchase)</option>
+            <option value="user_105">Priya N (Zero Sales & Zero Purchases Test)</option>
+          </select>
+        </div>
+        <button 
+          onClick={async () => {
+            await logoutUser();
+            navigate('/login');
+          }}
+          style={{ background: 'var(--danger, #B3372B)', color: '#fff', border: '1px solid var(--ink)', padding: '3px 8px', font: '700 10.5px var(--font-body)', cursor: 'pointer' }}
+        >
+          Sign out (dev)
+        </button>
       </div>
 
       {/* Profile Card */}

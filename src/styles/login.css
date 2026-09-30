@@ -1,0 +1,144 @@
+/* Scoped CSS for Login page matching login-refernce.HTML */
+
+.lg-page {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+}
+
+.lg-shell {
+  width: 100%;
+  max-width: 420px;
+}
+
+.lg-masthead {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+  font: 700 9.5px var(--font-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  margin-bottom: 16px;
+  color: var(--teal);
+}
+
+.lg-title {
+  font-family: var(--font-display);
+  font-size: 27px;
+  line-height: 1.18;
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.lg-lede {
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+  line-height: 1.5;
+  margin: 0 0 26px;
+}
+
+.lg-card {
+  border: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-hard-lg);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.lg-card .lg-eyebrow {
+  font: 700 9.5px var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-quiet);
+  margin-bottom: 14px;
+}
+
+.lg-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  box-shadow: var(--shadow-hard);
+  padding: 13px 16px;
+  font: 700 14.5px var(--font-body);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.lg-google-btn:active:not(:disabled) {
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: translate(2px, 2px);
+}
+
+.lg-google-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.lg-fine-print {
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+  line-height: 1.5;
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+.lg-fine-print a {
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.lg-why-box {
+  display: flex;
+  gap: 8px;
+  border: 1.5px solid var(--line-soft);
+  background: #F2F3EC;
+  padding: 10px 12px;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #3A403E;
+}
+
+.lg-why-box svg {
+  flex: none;
+  color: var(--teal);
+  margin-top: 1px;
+}
+
+.lg-pickup-note {
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+  margin: 22px 0 8px;
+  text-align: center;
+}
+
+.lg-pickup-chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lg-chip {
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+  font: 700 10.5px var(--font-body);
+  padding: 5px 10px;
+  box-shadow: 1px 1px 0 var(--ink);
+}

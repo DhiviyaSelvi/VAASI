@@ -1,6 +1,14 @@
 import { MOCK_USER, MOCK_USERS } from '../data/mockData';
 
 const DELAY_MS = 300;
+let isSignedInState = false; // Default signed out for testing auth protection
+
+/**
+ * Check sync auth state.
+ */
+export function getCurrentAuthState() {
+  return isSignedInState;
+}
 
 /**
  * Get currently authenticated user profile.
@@ -11,7 +19,7 @@ const DELAY_MS = 300;
 export async function getCurrentUser() {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({ ...MOCK_USER });
+      resolve(isSignedInState ? { ...MOCK_USER } : null);
     }, DELAY_MS);
   });
 }
@@ -32,14 +40,27 @@ export async function getUserById(userId) {
 }
 
 /**
- * Log in user using OTP or Firebase Auth provider.
+ * Sign in user using Google Auth provider.
  * 
  * Firebase implementation plan:
- * Will trigger signInWithPhoneNumber or signInWithPopup(auth, provider).
+ * Will call signInWithPopup(auth, googleProvider) or signInWithRedirect.
+ */
+export async function signInWithGoogle() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      isSignedInState = true;
+      resolve({ ...MOCK_USER });
+    }, DELAY_MS);
+  });
+}
+
+/**
+ * Log in user using credentials.
  */
 export async function loginUser(credentials) {
   return new Promise((resolve) => {
     setTimeout(() => {
+      isSignedInState = true;
       resolve({ ...MOCK_USER, ...credentials });
     }, DELAY_MS);
   });
@@ -54,6 +75,7 @@ export async function loginUser(credentials) {
 export async function logoutUser() {
   return new Promise((resolve) => {
     setTimeout(() => {
+      isSignedInState = false;
       resolve(true);
     }, DELAY_MS);
   });
