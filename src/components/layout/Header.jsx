@@ -3,11 +3,12 @@ import { Link, NavLink } from 'react-router-dom';
 
 /**
  * Header Component
- * Below 860px on BookDetail route, Header hides (top back bar replaces it).
+ * Below 860px on BookDetail, Sell, and Chat routes, Header hides (top bar replaces it).
  */
-export default function Header({ isBookDetail }) {
+export default function Header({ isBookDetail, isSellPage, isChatPage }) {
+  const hideOnMobile = isBookDetail || isSellPage || isChatPage;
   return (
-    <header className={`site-header ${isBookDetail ? 'bd-header-mobile-hide' : ''}`}>
+    <header className={`site-header ${hideOnMobile ? 'bd-header-mobile-hide' : ''}`}>
       <div className="brand">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
           <path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5z"/>

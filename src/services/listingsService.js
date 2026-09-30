@@ -1,4 +1,4 @@
-import { MOCK_LISTINGS } from '../data/mockData';
+import { MOCK_LISTINGS } from '../data/mockData.js';
 
 const DELAY_MS = 350;
 
@@ -55,17 +55,66 @@ export async function createListing(listingData) {
 }
 
 /**
- * Mark a listing as sold.
+ * Fetch listings by seller ID.
+ */
+export async function getListingsBySeller(sellerId) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const items = MOCK_LISTINGS.filter((l) => l.sellerId === sellerId);
+      resolve([...items]);
+    }, DELAY_MS);
+  });
+}
+
+/**
+ * Fetch purchased listings by buyer ID.
+ */
+export async function getPurchasedListings(buyerId) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const items = MOCK_LISTINGS.filter((l) => l.buyerId === buyerId && l.status === 'sold');
+      resolve([...items]);
+    }, DELAY_MS);
+  });
+}
+
+/**
+ * Update a listing's price.
+ */
+export async function updateListingPrice(id, newPrice) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const target = MOCK_LISTINGS.find((l) => l.id === id);
+      if (target) {
+        target.price = newPrice;
+        resolve({ ...target });
+      } else {
+        reject(new Error(`Listing ${id} not found`));
+      }
+    }, DELAY_MS);
+  });
+}
+
+/**
+ * Mark a listing as sold (with optional buyerId).
  * 
  * Firebase implementation plan:
- * Will call updateDoc(doc(db, 'listings', id), { status: 'sold' }).
+ * Will call updateDoc(doc(db, 'listings', id), { status: 'sold', buyerId }).
  */
-export async function markSold(id) {
+export async function markSold(id, buyerId) {
   return new Promise((resolve) => {
     setTimeout(() => {
       const target = MOCK_LISTINGS.find((l) => l.id === id);
-      if (target) target.status = 'sold';
-      resolve(target);
+      if (target) {
+        target.status = 'sold';
+        if (buyerId) {
+          target.buyerId = buyerId;
+        } else if (!target.buyerId) {
+          // Default mock buyer if unspecified
+          target.buyerId = 'user_102';
+        }
+      }
+      resolve(target ? { ...target } : null);
     }, DELAY_MS);
   });
 }

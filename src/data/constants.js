@@ -41,11 +41,13 @@
  * @property {Message[]} messages
  */
 
+import { PRICING } from '../utils/pricing.js';
+
 export const CONDITIONS = {
-  LIKE_NEW: { id: 'like_new', label: 'Like New', color: 'var(--color-condition-like-new)' },
-  GOOD: { id: 'good', label: 'Good', color: 'var(--color-condition-good)' },
-  FAIR: { id: 'fair', label: 'Fair', color: 'var(--color-condition-fair)' },
-  WELL_READ: { id: 'well_read', label: 'Well Read', color: 'var(--color-condition-well-read)' },
+  LIKE_NEW: { id: 'like_new', label: PRICING.ranges.like_new.label, suggestRange: `Suggest: ${PRICING.ranges.like_new.range} of MRP`, desc: 'No highlights, no name, crisp pages, undamaged spine.', color: 'var(--color-condition-like-new)' },
+  GOOD: { id: 'good', label: PRICING.ranges.good.label, suggestRange: `Suggest: ${PRICING.ranges.good.range} of MRP`, desc: 'Minor corner wear, neat pencil notes allowed.', color: 'var(--color-condition-good)' },
+  FAIR: { id: 'fair', label: PRICING.ranges.fair.label, suggestRange: `Suggest: ${PRICING.ranges.fair.range} of MRP`, desc: 'Visible wear, yellowing pages, some highlighting.', color: 'var(--color-condition-fair)' },
+  WELL_READ: { id: 'well_read', label: PRICING.ranges.well_read.label, suggestRange: `Suggest: ${PRICING.ranges.well_read.range} of MRP`, desc: 'Cover creased, extensive reading marks, 100% readable.', color: 'var(--color-condition-well-read)' },
 };
 
 export const CATEGORIES = [

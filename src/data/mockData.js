@@ -75,13 +75,13 @@ export const MOCK_LISTINGS = [
     price: 750,
     description: 'Complete collector edition set. Read once, crisp pages.',
     locality: 'Peelamedu',
-    landmark: 'near PSG Tech Main Gate', // SAMPLE TEST DATA, not real
-    handoffNote: 'Can meet outside PSG Tech gate between 4 PM and 7 PM on weekdays.', // SAMPLE TEST DATA, not real
-    sellerNote: 'Used for 2 semesters. No missing pages or ink stains.', // SAMPLE TEST DATA, not real
-    edition: 'Revised 2021 Print', // SAMPLE TEST DATA, not real
-    pages: '462 (Vol 1) + 450 (Vol 2)', // SAMPLE TEST DATA, not real
-    language: 'English', // SAMPLE TEST DATA, not real
-    extras: 'Handwritten solution set', // SAMPLE TEST DATA, not real
+    landmark: 'near PSG Tech Main Gate',
+    handoffNote: 'Can meet outside PSG Tech gate between 4 PM and 7 PM on weekdays.',
+    sellerNote: 'Used for 2 semesters. No missing pages or ink stains.',
+    edition: 'Revised 2021 Print',
+    pages: '462 (Vol 1) + 450 (Vol 2)',
+    language: 'English',
+    extras: 'Handwritten solution set',
     photoUrls: ['/sample-book-1.svg', '/sample-book-2.svg'],
     editionNote: '5 Vol Set',
     checklist: [
@@ -90,9 +90,11 @@ export const MOCK_LISTINGS = [
       { label: 'No ink markings', status: 'yes' },
       { label: 'Includes Vol 5 map booklet', status: 'partial' }
     ],
-    status: 'available',
-    sellerId: 'user_102',
-    sellerName: 'Karthik R.',
+    status: 'reserved',
+    sellerId: 'user_101',
+    sellerName: 'Kavitha R',
+    buyerId: 'user_102',
+    buyerName: 'Karthik R.',
     createdAt: '2026-09-22T14:15:00Z'
   },
   {
@@ -108,9 +110,11 @@ export const MOCK_LISTINGS = [
     locality: 'Gandhipuram',
     photoUrls: [],
     editionNote: 'Paperback Edition',
-    status: 'available',
-    sellerId: 'user_103',
-    sellerName: 'Deepak S',
+    status: 'sold',
+    sellerId: 'user_101',
+    sellerName: 'Kavitha R',
+    buyerId: 'user_103',
+    buyerName: 'Deepak S',
     createdAt: '2026-09-25T09:00:00Z'
   },
   {
@@ -126,9 +130,11 @@ export const MOCK_LISTINGS = [
     locality: 'Peelamedu',
     photoUrls: [],
     editionNote: 'Notes Marked',
-    status: 'available',
+    status: 'sold',
     sellerId: 'user_104',
     sellerName: 'Siddharth M',
+    buyerId: 'user_101',
+    buyerName: 'Kavitha R',
     createdAt: '2026-09-26T14:00:00Z'
   },
   {
@@ -168,6 +174,22 @@ export const MOCK_CONVERSATIONS = [
         senderId: 'user_101',
         text: 'Yes! Available today around 5 PM.',
         createdAt: '2026-09-26T11:05:00Z'
+      }
+    ]
+  },
+  {
+    id: 'c2',
+    listingId: 'b2',
+    participantIds: ['user_101', 'user_102'],
+    messages: [
+      {
+        id: 'm10',
+        senderId: 'user_102',
+        type: 'match',
+        status: 'agreed',
+        location: 'Peelamedu',
+        time: 'today 5:30 PM',
+        createdAt: '2026-09-26T12:00:00Z'
       }
     ]
   }

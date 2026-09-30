@@ -13,16 +13,18 @@ export default function PageShell() {
   const location = useLocation();
   const isLoginPage = location.pathname === '/login';
   const isBookDetail = location.pathname.startsWith('/book/');
+  const isSellPage = location.pathname === '/sell';
+  const isChatPage = location.pathname.startsWith('/chat/');
 
   return (
-    <div className={`app-container ${isBookDetail ? 'is-book-detail-page' : ''}`}>
-      {!isLoginPage && <Header isBookDetail={isBookDetail} />}
+    <div className={`app-container ${isBookDetail ? 'is-book-detail-page' : ''} ${isSellPage ? 'is-sell-page' : ''} ${isChatPage ? 'is-chat-page' : ''}`}>
+      {!isLoginPage && <Header isBookDetail={isBookDetail} isSellPage={isSellPage} isChatPage={isChatPage} />}
       
       <main className="main-content">
         <Outlet />
       </main>
 
-      {!isLoginPage && !isBookDetail && <BottomNav />}
+      {!isLoginPage && !isBookDetail && !isSellPage && !isChatPage && <BottomNav />}
     </div>
   );
 }

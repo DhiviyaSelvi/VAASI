@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getListingById, markSold } from '../services/listingsService';
 import { getCurrentUser, getUserById } from '../services/authService';
+import { getOrCreateConversationForListing } from '../services/chatService';
 import ConditionBadge from '../components/books/ConditionBadge';
 import Button from '../components/common/Button';
 import '../styles/book-detail.css';
@@ -16,6 +17,7 @@ export default function BookDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [isNavigatingChat, setIsNavigatingChat] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,6 +68,19 @@ export default function BookDetail() {
       setListing(updated);
     } catch (err) {
       alert('Failed to mark listing as sold');
+    }
+  };
+
+  const handleChatNavigate = async (e) => {
+    e.preventDefault();
+    if (!listing || !listing.sellerId) return;
+    try {
+      setIsNavigatingChat(true);
+      const convId = await getOrCreateConversationForListing(id, listing.sellerId);
+      navigate('/chat/' + convId);
+    } catch (err) {
+      console.error('Failed to initiate chat', err);
+      setIsNavigatingChat(false);
     }
   };
 
@@ -437,28 +452,28 @@ export default function BookDetail() {
                         Quick offer:
                       </span>
                       <div className="offer-btns">
-                        <Link to="/chat" className="offer-btn">
+                        <button onClick={handleChatNavigate} className="offer-btn" disabled={isNavigatingChat}>
                           Offer ₹{offer88}
-                        </Link>
-                        <Link to="/chat" className="offer-btn">
+                        </button>
+                        <button onClick={handleChatNavigate} className="offer-btn" disabled={isNavigatingChat}>
                           Offer ₹{offer94}
-                        </Link>
+                        </button>
                       </div>
                     </div>
 
                     <div className="main-btns">
-                      <Link to="/chat" className="big-btn message">
+                      <button onClick={handleChatNavigate} className="big-btn message" disabled={isNavigatingChat}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round">
                           <path d="M4 5h16v11H9l-5 4z"/>
                         </svg>
                         Message {sellerFirstName}
-                      </Link>
-                      <Link to="/chat" className="big-btn meetup">
+                      </button>
+                      <button onClick={handleChatNavigate} className="big-btn meetup" disabled={isNavigatingChat}>
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round">
                           <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>
                         </svg>
                         Meetup
-                      </Link>
+                      </button>
                     </div>
                   </>
                 ) : (
