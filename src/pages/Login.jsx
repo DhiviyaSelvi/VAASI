@@ -11,9 +11,12 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       setIsSigningIn(true);
+      console.time('[Auth Timing] Click to Popup open');
+      console.time('[Auth Timing] Popup resolve to Redirect completion');
+      
       await signInWithGoogle();
       
-      // Navigate to previous location if provided, else default to home '/'
+      console.timeEnd('[Auth Timing] Popup resolve to Redirect completion');
       const fromPath = location.state?.from?.pathname || '/';
       navigate(fromPath, { replace: true });
     } catch (err) {

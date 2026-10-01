@@ -23,17 +23,19 @@ export default function Profile() {
   const [editPriceVal, setEditPriceVal] = useState('');
   const [editPriceErr, setEditPriceErr] = useState(null);
 
-  // Dev user switching state for testing empty states vs active user
-  const [selectedUserId, setSelectedUserId] = useState('user_101');
+  // Dev user switching state for testing empty states vs active user ('real' | mock user id)
+  const [selectedUserId, setSelectedUserId] = useState('real');
 
   useEffect(() => {
     async function loadProfileData() {
       try {
         setLoading(true);
         // Load user profile
-        let userObj = await getUserById(selectedUserId);
-        if (!userObj && selectedUserId === 'user_101') {
+        let userObj = null;
+        if (selectedUserId === 'real') {
           userObj = await getCurrentUser();
+        } else {
+          userObj = await getUserById(selectedUserId);
         }
         setCurrentUser(userObj);
 
@@ -162,19 +164,20 @@ export default function Profile() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>Dev Switch Profile View:</span>
           <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
-            <option value="user_101">Kavitha R (Active + Sold + Purchases)</option>
-            <option value="user_103">Deepak S (Zero Sales Test - 1 Purchase)</option>
-            <option value="user_105">Priya N (Zero Sales & Zero Purchases Test)</option>
+            <option value="real">My Real Account (Google Auth + Firestore)</option>
+            <option value="user_101">Kavitha R (Mock: Active + Sold + Purchases)</option>
+            <option value="user_103">Deepak S (Mock: Zero Sales Test - 1 Purchase)</option>
+            <option value="user_105">Priya N (Mock: Zero Sales & Zero Purchases Test)</option>
           </select>
         </div>
         <button 
+          className="pf-signout-btn"
           onClick={async () => {
             await logoutUser();
             navigate('/login');
           }}
-          style={{ background: 'var(--danger, #B3372B)', color: '#fff', border: '1px solid var(--ink)', padding: '3px 8px', font: '700 10.5px var(--font-body)', cursor: 'pointer' }}
         >
-          Sign out (dev)
+          Sign out
         </button>
       </div>
 

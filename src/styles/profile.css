@@ -324,6 +324,21 @@
   background: #fff;
 }
 
+.pf-signout-btn {
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+  font: 700 11px var(--font-body);
+  padding: 5px 10px;
+  box-shadow: 1px 1px 0 var(--ink);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.pf-signout-btn:hover {
+  background: var(--marigold-tint);
+}
+
 @media (min-width: 860px) {
   .pf-wrap {
     padding: 0 32px;

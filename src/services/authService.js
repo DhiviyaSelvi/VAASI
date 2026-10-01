@@ -1,82 +1,119 @@
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut as firebaseSignOut 
+} from "firebase/auth";
+import { auth } from "../firebase";
 import { MOCK_USER, MOCK_USERS } from '../data/mockData';
 
-const DELAY_MS = 300;
-let isSignedInState = false; // Default signed out for testing auth protection
+let firebaseUser = null;
+let authInitialized = false;
+let authListeners = [];
+
+// Listen to real Firebase Auth state changes
+onAuthStateChanged(auth, (user) => {
+  firebaseUser = user;
+  authInitialized = true;
+  authListeners.forEach((cb) => cb(user));
+});
+
+/**
+ * Subscribe to auth state loading/change.
+ */
+export function subscribeAuthState(callback) {
+  authListeners.push(callback);
+  if (authInitialized) {
+    callback(firebaseUser);
+  }
+  return () => {
+    authListeners = authListeners.filter((cb) => cb !== callback);
+  };
+}
 
 /**
  * Check sync auth state.
  */
 export function getCurrentAuthState() {
-  return isSignedInState;
+  return !!firebaseUser;
+}
+
+/**
+ * Check if auth state is initialized.
+ */
+export function isAuthInitialized() {
+  return authInitialized;
 }
 
 /**
  * Get currently authenticated user profile.
- * 
- * Firebase implementation plan:
- * Will listen to firebase/auth onAuthStateChanged and fetch matching user doc from Firestore.
  */
 export async function getCurrentUser() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(isSignedInState ? { ...MOCK_USER } : null);
-    }, DELAY_MS);
-  });
+  if (firebaseUser) {
+    return {
+      id: firebaseUser.uid,
+      name: firebaseUser.displayName || 'Firebase User',
+      email: firebaseUser.email,
+      photoURL: firebaseUser.photoURL,
+      locality: 'Peelamedu',
+      college: 'PSG College of Technology',
+      memberSince: new Date().toISOString(),
+      ratingAverage: 0,
+      ratingCount: 0
+    };
+  }
+  return { ...MOCK_USER };
 }
 
 /**
  * Get user profile by user ID.
- * 
- * Firebase implementation plan:
- * Will fetch doc(db, 'users', userId) from Firestore.
  */
 export async function getUserById(userId) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const user = MOCK_USERS[userId] || null;
-      resolve(user ? { ...user } : null);
-    }, DELAY_MS);
-  });
+  if (firebaseUser && firebaseUser.uid === userId) {
+    return {
+      id: firebaseUser.uid,
+      name: firebaseUser.displayName || 'Firebase User',
+      email: firebaseUser.email,
+      photoURL: firebaseUser.photoURL,
+      locality: 'Peelamedu',
+      college: 'PSG College of Technology',
+      memberSince: new Date().toISOString(),
+      ratingAverage: 0,
+      ratingCount: 0
+    };
+  }
+  const user = MOCK_USERS[userId] || null;
+  return user ? { ...user } : null;
 }
 
 /**
  * Sign in user using Google Auth provider.
- * 
- * Firebase implementation plan:
- * Will call signInWithPopup(auth, googleProvider) or signInWithRedirect.
  */
 export async function signInWithGoogle() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      isSignedInState = true;
-      resolve({ ...MOCK_USER });
-    }, DELAY_MS);
-  });
-}
-
-/**
- * Log in user using credentials.
- */
-export async function loginUser(credentials) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      isSignedInState = true;
-      resolve({ ...MOCK_USER, ...credentials });
-    }, DELAY_MS);
-  });
+  const provider = new GoogleAuthProvider();
+  const popupPromise = signInWithPopup(auth, provider);
+  console.timeEnd('[Auth Timing] Click to Popup open');
+  const result = await popupPromise;
+  const user = result.user;
+  return {
+    uid: user.uid,
+    displayName: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL
+  };
 }
 
 /**
  * Log out user session.
- * 
- * Firebase implementation plan:
- * Will call signOut(auth).
  */
 export async function logoutUser() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      isSignedInState = false;
-      resolve(true);
-    }, DELAY_MS);
-  });
+  await firebaseSignOut(auth);
+  return true;
+}
+
+/**
+ * Legacy login helper fallback.
+ */
+export async function loginUser(credentials) {
+  return signInWithGoogle();
 }

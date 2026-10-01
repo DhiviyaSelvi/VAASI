@@ -316,7 +316,15 @@ export default function Sell() {
                       name="condition" 
                       value={c.id} 
                       checked={condition === c.id}
-                      onChange={() => { setCondition(c.id); setIsDirty(true); }}
+                      onChange={() => { 
+                        setCondition(c.id); 
+                        setIsDirty(true);
+                        const num = parseFloat(mrp) || 0;
+                        const sug = suggestPrice(num, c.id, isOlderEdition, category);
+                        if (sug) {
+                          setPrice(sug.recommended.toString());
+                        }
+                      }}
                     />
                     <div className="cond-top">
                       <span className={`cond-tag t-${c.id}`}>{c.label}</span>
@@ -339,7 +347,16 @@ export default function Sell() {
                     type="number"
                     className="input" 
                     value={mrp}
-                    onChange={(e) => { setMrp(e.target.value); setIsDirty(true); }}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setMrp(val);
+                      setIsDirty(true);
+                      const num = parseFloat(val) || 0;
+                      const sug = suggestPrice(num, condition, isOlderEdition, category);
+                      if (sug && (!price || price === '0')) {
+                        setPrice(sug.recommended.toString());
+                      }
+                    }}
                     placeholder="e.g. 750"
                   />
                 </div>
