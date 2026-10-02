@@ -161,17 +161,20 @@ export default function Profile() {
     <main className="pf-wrap">
       {/* Dev Switcher for thorough testing */}
       <div className="pf-dev-user-select" style={{ justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>Dev Switch Profile View:</span>
-          <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
-            <option value="real">My Real Account (Google Auth + Firestore)</option>
-            <option value="user_101">Kavitha R (Mock: Active + Sold + Purchases)</option>
-            <option value="user_103">Deepak S (Mock: Zero Sales Test - 1 Purchase)</option>
-            <option value="user_105">Priya N (Mock: Zero Sales & Zero Purchases Test)</option>
-          </select>
-        </div>
+        {import.meta.env.DEV && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Dev Switch Profile View:</span>
+            <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
+              <option value="real">My Real Account (Google Auth + Firestore)</option>
+              <option value="user_101">Kavitha R (Mock: Active + Sold + Purchases)</option>
+              <option value="user_103">Deepak S (Mock: Zero Sales Test - 1 Purchase)</option>
+              <option value="user_105">Priya N (Mock: Zero Sales & Zero Purchases Test)</option>
+            </select>
+          </div>
+        )}
         <button 
           className="pf-signout-btn"
+          style={{ marginLeft: import.meta.env.DEV ? '0' : 'auto' }}
           onClick={async () => {
             await logoutUser();
             navigate('/login');
