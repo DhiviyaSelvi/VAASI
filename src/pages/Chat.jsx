@@ -1,10 +1,144 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getConversation, sendMessage, confirmMeetup } from '../services/chatService';
+import { 
+  getConversation, 
+  getConversationsForUser,
+  markConversationRead,
+  isConversationUnread,
+  formatRelativeTime,
+  subscribeToMessages, 
+  sendMessage, 
+  proposeMeetup, 
+  agreeMeetup, 
+  confirmMeetup, 
+  makeOffer, 
+  acceptOffer, 
+  deleteConversation 
+} from '../services/chatService';
 import { getListingById } from '../services/listingsService';
 import { getUserById } from '../services/authService';
+import { auth } from '../firebase';
 import ConditionBadge from '../components/books/ConditionBadge';
 import '../styles/chat.css';
+
+function ConversationRow({ conversation, currentUserId }) {
+  const navigate = useNavigate();
+  const [listing, setListing] = useState(null);
+  const [otherUser, setOtherUser] = useState(null);
+
+  const otherId = conversation.participantIds?.find(id => id !== currentUserId) || conversation.participantIds?.[0];
+  const unread = isConversationUnread(conversation, currentUserId);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (conversation.listingId) {
+      getListingById(conversation.listingId).then(l => { if (isMounted) setListing(l); }).catch(() => null);
+    }
+    if (otherId) {
+      getUserById(otherId).then(u => { if (isMounted) setOtherUser(u); }).catch(() => null);
+    }
+    return () => { isMounted = false; };
+  }, [conversation.listingId, otherId]);
+
+  const thumbnail = listing?.photoUrls && listing.photoUrls.length > 0 ? listing.photoUrls[0] : null;
+  const otherName = 
+    otherUser?.name || 
+    conversation.participantNames?.[otherId] || 
+    (listing?.sellerId === otherId ? listing?.sellerName : null) || 
+    listing?.sellerName || 
+    'Seller';
+  const previewText = conversation.lastMessageText || 'No messages yet';
+  const relTime = formatRelativeTime(conversation.lastMessageAt);
+
+  return (
+    <div className="ch-inbox-item" onClick={() => navigate(`/chat/${conversation.id}`)}>
+      <div className="ch-inbox-thumb">
+        {thumbnail ? (
+          <img src={thumbnail} alt={listing?.title || 'Book'} />
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="4" y="3" width="16" height="18" />
+          </svg>
+        )}
+      </div>
+
+      <div className="ch-inbox-info">
+        <div className="ch-inbox-row1">
+          <span className="ch-inbox-other-name">{otherName}</span>
+          <span className="ch-inbox-time">{relTime}</span>
+        </div>
+        <div className="ch-inbox-title">{listing?.title || 'Book Listing'}</div>
+        <div className="ch-inbox-preview-row">
+          <span className="ch-inbox-preview" style={{ fontWeight: unread ? '700' : '400' }}>
+            {previewText}
+          </span>
+          {unread && <span className="ch-inbox-unread-dot" title="Unread message" />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChatInbox() {
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const currentUserId = auth.currentUser?.uid;
+
+  useEffect(() => {
+    if (!currentUserId) {
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = getConversationsForUser(currentUserId, (convList) => {
+      setConversations(convList);
+      setLoading(false);
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [currentUserId]);
+
+  if (loading) {
+    return (
+      <div className="ch-page">
+        <div className="ch-inbox-container">
+          <div className="ch-inbox-header">Messages</div>
+          <div style={{ padding: '30px', textAlign: 'center', color: 'var(--ink-quiet)' }}>Loading conversations...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ch-page">
+      <div className="ch-inbox-container">
+        <div className="ch-inbox-header">
+          <span>Messages</span>
+        </div>
+
+        {conversations.length === 0 ? (
+          <div className="ch-empty">
+            <div className="ch-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              </svg>
+            </div>
+            <h2>No conversations yet</h2>
+            <p style={{ maxWidth: '340px' }}>Message a seller from a book you're interested in.</p>
+          </div>
+        ) : (
+          <div className="ch-inbox-list">
+            {conversations.map((conv) => (
+              <ConversationRow key={conv.id} conversation={conv} currentUserId={currentUserId} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Chat() {
   const { conversationId } = useParams();
@@ -32,16 +166,24 @@ export default function Chat() {
 
   const messagesEndRef = useRef(null);
   
-  const currentUserId = 'user_101'; // hardcoded for now, same as MOCK_USER.id
+  const currentUserId = auth.currentUser?.uid || 'user_101';
 
   useEffect(() => {
+    let unsubscribe = null;
+
     async function loadData() {
       try {
         const conv = await getConversation(conversationId);
+        if (!conv) {
+          setLoading(false);
+          return;
+        }
         setConversation(conv);
-        setMessages(conv.messages || []);
         
-        const otherId = conv.participantIds?.find(id => id !== currentUserId) || conv.participantIds?.[0];
+        const myUid = auth.currentUser?.uid || 'user_101';
+        markConversationRead(conversationId, myUid);
+
+        const otherId = conv.participantIds?.find(id => id !== myUid) || conv.participantIds?.[0];
         if (otherId) {
           getUserById(otherId).then(u => setOtherUser(u)).catch(() => null);
         }
@@ -52,17 +194,28 @@ export default function Chat() {
           const defaultOffer = Math.round((book.price * 0.9) / 10) * 10;
           setOfferAmount(defaultOffer.toString());
         }
+
+        // Realtime message subscription
+        unsubscribe = subscribeToMessages(conversationId, (newMessages) => {
+          setMessages(newMessages);
+          markConversationRead(conversationId, myUid);
+          setLoading(false);
+        });
       } catch (err) {
         console.error('Error loading chat:', err);
-      } finally {
         setLoading(false);
       }
     }
+
     if (conversationId) {
       loadData();
     } else {
       setLoading(false);
     }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [conversationId]);
 
   useEffect(() => {
@@ -75,19 +228,9 @@ export default function Chat() {
     if (!inputValue.trim()) return;
     const text = inputValue.trim();
     setInputValue('');
-    
-    // Optimistic update
-    const tempMsg = {
-      id: `temp_${Date.now()}`,
-      senderId: currentUserId,
-      text,
-      createdAt: new Date().toISOString()
-    };
-    setMessages((prev) => [...prev, tempMsg]);
 
     try {
-      const realMsg = await sendMessage(conversationId, text);
-      setMessages((prev) => prev.map((m) => m.id === tempMsg.id ? realMsg : m));
+      await sendMessage(conversationId, text);
     } catch (err) {
       console.error('Failed to send message', err);
     }
@@ -95,61 +238,44 @@ export default function Chat() {
 
   const handleShareLocation = () => {
     const text = "📍 Shared Location Pin: Gandhipuram (Approximate)";
-    // Optimistic update
-    const tempMsg = {
-      id: `temp_loc_${Date.now()}`,
-      senderId: currentUserId,
-      text,
-      createdAt: new Date().toISOString()
-    };
-    setMessages((prev) => [...prev, tempMsg]);
     sendMessage(conversationId, text).catch(console.error);
   };
 
-  const handleProposeSubmit = (e) => {
+  const handleProposeSubmit = async (e) => {
     e.preventDefault();
     if (!meetupLoc.trim() || !meetupTime.trim()) return;
-    if (messages.some(m => m.type === 'match' && (m.status === 'proposed' || m.status === 'agreed'))) return;
+    if (messages.some(m => (m.type === 'match' || m.type === 'matchCard') && (m.status === 'proposed' || m.status === 'agreed' || m.status === 'paid'))) return;
     
-    const proposalMsg = {
-      id: `match_${Date.now()}`,
-      senderId: currentUserId,
-      type: 'match',
-      status: 'proposed',
-      location: meetupLoc,
-      time: meetupTime,
-      createdAt: new Date().toISOString()
-    };
-    
-    setMessages((prev) => [...prev, proposalMsg]);
-    setShowProposeForm(false);
+    try {
+      await proposeMeetup(conversationId, meetupLoc, meetupTime);
+      setShowProposeForm(false);
+    } catch (err) {
+      console.error('Failed to propose meetup', err);
+    }
   };
 
-  const handleOfferSubmit = (e) => {
+  const handleOfferSubmit = async (e) => {
     e.preventDefault();
     const val = parseInt(offerAmount, 10);
     if (isNaN(val) || val <= 0) return;
-    if (messages.some(m => m.type === 'offer' && m.status === 'pending')) return;
+    if (messages.some(m => (m.type === 'offer' || m.type === 'offerCard') && m.status === 'pending')) return;
 
-    const offerMsg = {
-      id: `offer_${Date.now()}`,
-      senderId: currentUserId,
-      type: 'offer',
-      amount: val,
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
-
-    setMessages((prev) => [...prev, offerMsg]);
-    setShowOfferForm(false);
+    try {
+      await makeOffer(conversationId, val);
+      setShowOfferForm(false);
+    } catch (err) {
+      console.error('Failed to send offer', err);
+    }
   };
 
-  const handleAcceptOffer = (msgId, amount) => {
-    setMessages((prev) => prev.map((m) => 
-      m.id === msgId ? { ...m, status: 'accepted' } : m
-    ));
-    if (listing) {
-      setListing(prev => prev ? { ...prev, price: amount } : prev);
+  const handleAcceptOffer = async (msgId, amount) => {
+    try {
+      await acceptOffer(conversationId, msgId);
+      if (listing) {
+        setListing(prev => prev ? { ...prev, price: amount } : prev);
+      }
+    } catch (err) {
+      console.error('Failed to accept offer', err);
     }
   };
 
@@ -158,23 +284,22 @@ export default function Chat() {
     handleAcceptOffer(msgId, amount);
   };
 
-  const hasActiveMatch = messages.some(m => m.type === 'match' && (m.status === 'proposed' || m.status === 'agreed' || m.status === 'paid'));
-  const hasPendingOffer = messages.some(m => m.type === 'offer' && m.status === 'pending');
+  const hasActiveMatch = messages.some(m => (m.type === 'match' || m.type === 'matchCard') && (m.status === 'proposed' || m.status === 'agreed' || m.status === 'paid'));
+  const hasPendingOffer = messages.some(m => (m.type === 'offer' || m.type === 'offerCard') && m.status === 'pending');
 
   // ⚠️ TEMP/DEV-ONLY: Simulate the other person agreeing to the meetup
-  const simulateOtherAgrees = (msgId) => {
-    setMessages((prev) => prev.map((m) => 
-      m.id === msgId ? { ...m, status: 'agreed' } : m
-    ));
+  const simulateOtherAgrees = async (msgId) => {
+    try {
+      await agreeMeetup(conversationId, msgId);
+    } catch (err) {
+      console.error('Failed to agree meetup', err);
+    }
   };
 
   const handlePayFee = async (msgId) => {
     setIsPaying(true);
     try {
-      await confirmMeetup(conversationId);
-      setMessages((prev) => prev.map((m) => 
-        m.id === msgId ? { ...m, status: 'paid' } : m
-      ));
+      await confirmMeetup(conversationId, msgId);
     } catch (err) {
       console.error('Payment failed', err);
     } finally {
@@ -182,8 +307,20 @@ export default function Chat() {
     }
   };
 
+  const handleDeleteConversation = async () => {
+    if (window.confirm("Delete this conversation? This cannot be undone.")) {
+      try {
+        await deleteConversation(conversationId);
+        navigate('/chat');
+      } catch (err) {
+        console.error("Failed to delete conversation:", err);
+        alert("Failed to delete conversation: " + err.message);
+      }
+    }
+  };
+
   if (!conversationId) {
-    return <div className="ch-page"><div className="ch-body">Please select a conversation from your Profile or messages view.</div></div>;
+    return <ChatInbox />;
   }
 
   if (loading) {
@@ -212,7 +349,7 @@ export default function Chat() {
     <div className="ch-page">
       {/* Header Bar with Seller Profile */}
       <header className="ch-top">
-        <button className="ch-icon-btn" aria-label="Back" onClick={() => navigate(-1)}>
+        <button className="ch-icon-btn" aria-label="Back" onClick={() => navigate('/chat')}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
         </button>
         <div className="ch-seller-bar">
@@ -233,6 +370,17 @@ export default function Chat() {
             </div>
           </div>
         </div>
+
+        {/* Delete Conversation button */}
+        <button 
+          className="ch-icon-btn" 
+          aria-label="Delete Conversation" 
+          title="Delete Conversation" 
+          onClick={handleDeleteConversation}
+          style={{ marginLeft: 'auto' }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
       </header>
 
       {/* Mini Listing Preview Card */}
@@ -289,7 +437,7 @@ export default function Chat() {
             {messages.map((msg) => {
               const isMe = msg.senderId === currentUserId;
               
-              if (msg.type === 'offer') {
+              if (msg.type === 'offer' || msg.type === 'offerCard') {
                 return (
                   <div key={msg.id} className="ch-offer-card">
                     <div className="ch-offer-head">
@@ -318,7 +466,7 @@ export default function Chat() {
                     )}
 
                     {/* ⚠️ TEMP/DEV-ONLY BUTTON */}
-                    {msg.status === 'pending' && (
+                    {import.meta.env.DEV && msg.status === 'pending' && (
                       <button 
                         onClick={() => simulateOtherAcceptsOffer(msg.id, msg.amount)}
                         className="ch-dev-btn"
@@ -330,7 +478,7 @@ export default function Chat() {
                 );
               }
 
-              if (msg.type === 'match') {
+              if (msg.type === 'match' || msg.type === 'matchCard') {
                 return (
                   <div key={msg.id} className="ch-match-card">
                     <div className="ch-match-head">
@@ -352,7 +500,7 @@ export default function Chat() {
                     )}
                     
                     {/* ⚠️ TEMP/DEV-ONLY BUTTON */}
-                    {msg.status === 'proposed' && (
+                    {import.meta.env.DEV && msg.status === 'proposed' && (
                       <button 
                         onClick={() => simulateOtherAgrees(msg.id)}
                         className="ch-dev-btn"
