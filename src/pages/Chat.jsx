@@ -19,6 +19,8 @@ import { getListingById } from '../services/listingsService';
 import { getUserById } from '../services/authService';
 import { auth } from '../firebase';
 import ConditionBadge from '../components/books/ConditionBadge';
+import ListingImage from '../components/common/ListingImage';
+import UserAvatar from '../components/common/UserAvatar';
 import '../styles/chat.css';
 
 function ConversationRow({ conversation, currentUserId }) {
@@ -41,30 +43,47 @@ function ConversationRow({ conversation, currentUserId }) {
   }, [conversation.listingId, otherId]);
 
   const thumbnail = listing?.photoUrls && listing.photoUrls.length > 0 ? listing.photoUrls[0] : null;
-  const otherName = 
+  const otherFirstName = (
     otherUser?.name || 
     conversation.participantNames?.[otherId] || 
     (listing?.sellerId === otherId ? listing?.sellerName : null) || 
     listing?.sellerName || 
-    'Seller';
+    'Seller'
+  ).trim().split(' ')[0];
+
   const previewText = conversation.lastMessageText || 'No messages yet';
   const relTime = formatRelativeTime(conversation.lastMessageAt);
 
   return (
     <div className="ch-inbox-item" onClick={() => navigate(`/chat/${conversation.id}`)}>
       <div className="ch-inbox-thumb">
-        {thumbnail ? (
-          <img src={thumbnail} alt={listing?.title || 'Book'} />
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <rect x="4" y="3" width="16" height="18" />
-          </svg>
-        )}
+        <div className="ch-thumb-inner">
+          <ListingImage 
+            src={thumbnail} 
+            title={listing?.title} 
+            fallbackIconSize={20} 
+            compact={true}
+          />
+        </div>
+        <UserAvatar 
+          name={otherFirstName} 
+          size="small" 
+          style={{ 
+            width: '20px',
+            height: '20px',
+            fontSize: '9.5px',
+            position: 'absolute', 
+            bottom: '-3px', 
+            right: '-3px', 
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+          }} 
+        />
       </div>
 
       <div className="ch-inbox-info">
         <div className="ch-inbox-row1">
-          <span className="ch-inbox-other-name">{otherName}</span>
+          <span className="ch-inbox-other-name">{otherFirstName}</span>
           <span className="ch-inbox-time">{relTime}</span>
         </div>
         <div className="ch-inbox-title">{listing?.title || 'Book Listing'}</div>
@@ -341,9 +360,8 @@ export default function Chat() {
   const hasDiscount = listing?.mrp && listing?.price && listing.mrp > listing.price;
   const percentOff = hasDiscount ? Math.round(((listing.mrp - listing.price) / listing.mrp) * 100) : 0;
   
-  const otherName = otherUser?.name || 'Seller';
+  const otherFirstName = (otherUser?.name || 'Seller').trim().split(' ')[0];
   const otherCollege = otherUser?.college || listing?.locality || 'Peelamedu';
-  const otherInitials = otherName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <div className="ch-page">
@@ -353,10 +371,10 @@ export default function Chat() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
         </button>
         <div className="ch-seller-bar">
-          <div className="ch-seller-avatar">{otherInitials}</div>
+          <UserAvatar name={otherFirstName} size="medium" />
           <div className="ch-seller-info">
             <div className="ch-seller-name">
-              {otherName}
+              {otherFirstName}
               {otherUser?.collegeEmailVerified && (
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{display: 'inline', marginLeft: '4px', verticalAlign: 'middle'}}>
                   <circle cx="12" cy="12" r="10" fill="#0F5148" />
@@ -388,11 +406,13 @@ export default function Chat() {
         <div className="ch-preview-card-wrap">
           <div className="ch-preview-card">
             <div className="ch-preview-thumb">
-              {thumbnail ? (
-                <img src={thumbnail} alt={listing.title} />
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="3" width="16" height="18"/></svg>
-              )}
+              <ListingImage 
+                src={thumbnail} 
+                alt={listing.title} 
+                title={listing.title} 
+                fallbackIconSize={18} 
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </div>
             
             <div className="ch-preview-details">

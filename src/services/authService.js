@@ -83,7 +83,9 @@ export async function getUserById(userId) {
     };
   }
   const user = MOCK_USERS[userId] || null;
-  return user ? { ...user } : null;
+  if (!user) return null;
+  const { email, ...publicProfile } = user;
+  return publicProfile;
 }
 
 /**

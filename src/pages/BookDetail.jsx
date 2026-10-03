@@ -5,6 +5,8 @@ import { getCurrentUser, getUserById } from '../services/authService';
 import { getOrCreateConversationForListing } from '../services/chatService';
 import ConditionBadge from '../components/books/ConditionBadge';
 import Button from '../components/common/Button';
+import ListingImage from '../components/common/ListingImage';
+import UserAvatar from '../components/common/UserAvatar';
 import '../styles/book-detail.css';
 
 export default function BookDetail() {
@@ -18,6 +20,14 @@ export default function BookDetail() {
   const [error, setError] = useState(null);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [isNavigatingChat, setIsNavigatingChat] = useState(false);
+
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -73,7 +83,20 @@ export default function BookDetail() {
 
   const handleChatNavigate = async (e) => {
     e.preventDefault();
+    if (isNavigatingChat) return;
+
+    if (!auth.currentUser) {
+      navigate('/login');
+      return;
+    }
+
     if (!listing || !listing.sellerId) return;
+
+    const currentUid = auth.currentUser.uid;
+    if (currentUid === listing.sellerId) {
+      return;
+    }
+
     try {
       setIsNavigatingChat(true);
       const convId = await getOrCreateConversationForListing(id, listing.sellerId);
@@ -98,7 +121,8 @@ export default function BookDetail() {
 
   const photoList = listing?.photoUrls || [];
   const hasPhotos = photoList.length > 0;
-  const isOwner = currentUser && listing && currentUser.id === listing.sellerId;
+  const currentUid = auth.currentUser?.uid || currentUser?.id || currentUser?.uid;
+  const isOwner = Boolean(currentUid && listing?.sellerId && currentUid === listing.sellerId);
 
   // Compute seller initials for avatar
   const sellerFullName = sellerUser?.name || listing?.sellerName || 'Seller';
@@ -135,7 +159,7 @@ export default function BookDetail() {
     <div className="bd-page">
       {/* Top Header Bar */}
       <header className="detail-top">
-        <button onClick={() => navigate(-1)} className="icon-btn" type="button" aria-label="Back">
+        <button onClick={handleBack} className="icon-btn" type="button" aria-label="Back">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M11 6l-6 6 6 6"/>
           </svg>
@@ -201,21 +225,13 @@ export default function BookDetail() {
                 </span>
 
                 <div className="hero-photo">
-                  {hasPhotos ? (
-                    <img
-                      src={photoList[activePhotoIdx] || photoList[0]}
-                      alt={listing.title}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <>
-                      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
-                        <path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5z"/>
-                        <path d="M12 6v13.5"/>
-                      </svg>
-                      No photo added yet
-                    </>
-                  )}
+                  <ListingImage
+                    src={photoList[activePhotoIdx] || photoList[0]}
+                    alt={listing.title}
+                    title={listing.title}
+                    fallbackIconSize={32}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
                 </div>
 
                 {hasPhotos && photoList.length > 0 && (
@@ -234,7 +250,13 @@ export default function BookDetail() {
                       onClick={() => setActivePhotoIdx(idx)}
                     >
                       <div className="thumb-img">
-                        <img src={url} alt={`Thumb ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <ListingImage 
+                          src={url} 
+                          alt={`Thumb ${idx + 1}`} 
+                          title={listing.title} 
+                          fallbackIconSize={16}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                        />
                       </div>
                       <div className="thumb-label">{getThumbLabel(idx)}</div>
                     </div>
@@ -310,10 +332,10 @@ export default function BookDetail() {
               {!isOwner && sellerUser && (
                 <div className="card seller-card">
                   <div className="seller-head">
-                    <div className="avatar">{sellerInitials}</div>
+                    <UserAvatar name={sellerFirstName} size="medium" />
                     <div className="seller-id">
                       <div className="seller-name">
-                        {sellerUser.name || listing.sellerName}
+                        {sellerFirstName}
                         {sellerUser.collegeEmailVerified && (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="10" fill="#0F5148" />

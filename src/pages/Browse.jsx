@@ -9,8 +9,8 @@ export default function Browse() {
   const { listings, loading, error, refetch, toggleForceError, isForcedError } = useListings();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Feature 1: No filter chip is active by default
-  const [activeChip, setActiveChip] = useState(null);
+  // Feature 1: Multi-select filter chips
+  const [activeChips, setActiveChips] = useState([]);
 
   const CHIPS = [
     { id: 'under150', label: 'Under ₹150' },
@@ -20,10 +20,14 @@ export default function Browse() {
   ];
 
   const handleChipClick = (chipId) => {
-    setActiveChip((prev) => (prev === chipId ? null : chipId));
+    setActiveChips((prev) =>
+      prev.includes(chipId)
+        ? prev.filter((id) => id !== chipId)
+        : [...prev, chipId]
+    );
   };
 
-  // Filter listings by search query & active chip
+  // Filter listings by search query & active chips (AND logic)
   const filteredListings = useMemo(() => {
     return listings.filter((item) => {
       // 1. Search filter (title or author)
@@ -34,20 +38,23 @@ export default function Browse() {
         if (!titleMatch && !authorMatch) return false;
       }
 
-      // 2. Chip filter
-      if (activeChip === 'under150') {
+      // 2. Chip filters (AND logic: must satisfy ALL active chips)
+      if (activeChips.includes('under150')) {
         if (item.price > 150) return false;
-      } else if (activeChip === 'likeNew') {
+      }
+      if (activeChips.includes('likeNew')) {
         if (item.condition !== 'like_new') return false;
-      } else if (activeChip === 'textbooks') {
-        if (item.category !== 'Academic & Textbooks' && item.category !== 'Engineering & Tech') return false;
-      } else if (activeChip === 'tamil') {
+      }
+      if (activeChips.includes('textbooks')) {
+        if (item.category !== 'Academic & Textbooks' && item.category !== 'Engineering & Tech' && item.category !== 'College Textbooks') return false;
+      }
+      if (activeChips.includes('tamil')) {
         if (item.category !== 'Tamil Literature') return false;
       }
 
       return true;
     });
-  }, [listings, searchQuery, activeChip]);
+  }, [listings, searchQuery, activeChips]);
 
   // Feature 3: Categorized shelves + Non-Fiction & Self-Help + More Books fallback
   const collegeListings = useMemo(() => {
@@ -136,7 +143,7 @@ export default function Browse() {
       {/* FILTER CHIPS */}
       <div className="chips">
         {CHIPS.map((chip) => {
-          const isActive = activeChip === chip.id;
+          const isActive = activeChips.includes(chip.id);
           return (
             <button
               key={chip.id}

@@ -322,8 +322,13 @@ export async function acceptOffer(conversationId, messageId) {
   await updateDoc(msgRef, { status: 'accepted' });
 }
 
+// Module-level map to prevent concurrent duplicate conversation creation calls
+const pendingConvsMap = new Map();
+
 /**
  * Get existing conversation for a listing, or create a new one.
+ * Queries conversations where participantIds array-contains currentUserId,
+ * then filters by listingId and sellerId on the client to avoid permission errors.
  */
 export async function getOrCreateConversationForListing(listingId, sellerId) {
   const user = auth.currentUser;
@@ -331,55 +336,77 @@ export async function getOrCreateConversationForListing(listingId, sellerId) {
 
   const currentUserId = user.uid;
 
-  const q = query(
-    collection(db, 'conversations'),
-    where('listingId', '==', listingId),
-    where('participantIds', 'array-contains', currentUserId)
-  );
-
-  const snapshot = await getDocs(q);
-  const existingDoc = snapshot.docs.find(d => {
-    const data = d.data();
-    return data.participantIds && data.participantIds.includes(sellerId);
-  });
-
-  if (existingDoc) {
-    return existingDoc.id;
+  if (currentUserId === sellerId) {
+    throw new Error("Cannot message yourself.");
   }
 
-  // Fetch listing to get seller's name
-  let sellerName = 'Seller';
+  const mapKey = `${listingId}_${currentUserId}_${sellerId}`;
+  if (pendingConvsMap.has(mapKey)) {
+    return pendingConvsMap.get(mapKey);
+  }
+
+  const convPromise = (async () => {
+    const q = query(
+      collection(db, 'conversations'),
+      where('participantIds', 'array-contains', currentUserId)
+    );
+
+    const snapshot = await getDocs(q);
+    const existingDoc = snapshot.docs.find(d => {
+      const data = d.data();
+      return (
+        data.listingId === listingId && 
+        Array.isArray(data.participantIds) && 
+        data.participantIds.includes(sellerId)
+      );
+    });
+
+    if (existingDoc) {
+      return existingDoc.id;
+    }
+
+    // Fetch listing to get seller's name
+    let sellerName = 'Seller';
+    try {
+      const listingDocRef = doc(db, 'listings', listingId);
+      const listingSnap = await getDoc(listingDocRef);
+      if (listingSnap.exists()) {
+        sellerName = listingSnap.data().sellerName || 'Seller';
+      }
+    } catch (e) {
+      console.error("Could not fetch listing sellerName:", e);
+    }
+
+    const currentUserName = user.displayName || user.email || 'User';
+
+    const newConv = {
+      listingId,
+      participantIds: [currentUserId, sellerId],
+      participantNames: {
+        [currentUserId]: currentUserName,
+        [sellerId]: sellerName
+      },
+      createdAt: serverTimestamp(),
+      lastMessageAt: serverTimestamp(),
+      lastMessageText: 'Conversation started',
+      lastMessageSenderId: currentUserId,
+      matchStatus: 'none',
+      lastReadBy: {
+        [currentUserId]: serverTimestamp()
+      }
+    };
+
+    const docRef = await addDoc(collection(db, 'conversations'), newConv);
+    return docRef.id;
+  })();
+
+  pendingConvsMap.set(mapKey, convPromise);
+
   try {
-    const listingDocRef = doc(db, 'listings', listingId);
-    const listingSnap = await getDoc(listingDocRef);
-    if (listingSnap.exists()) {
-      sellerName = listingSnap.data().sellerName || 'Seller';
-    }
-  } catch (e) {
-    console.error("Could not fetch listing sellerName:", e);
+    return await convPromise;
+  } finally {
+    pendingConvsMap.delete(mapKey);
   }
-
-  const currentUserName = user.displayName || user.email || 'User';
-
-  const newConv = {
-    listingId,
-    participantIds: [currentUserId, sellerId],
-    participantNames: {
-      [currentUserId]: currentUserName,
-      [sellerId]: sellerName
-    },
-    createdAt: serverTimestamp(),
-    lastMessageAt: serverTimestamp(),
-    lastMessageText: 'Conversation started',
-    lastMessageSenderId: currentUserId,
-    matchStatus: 'none',
-    lastReadBy: {
-      [currentUserId]: serverTimestamp()
-    }
-  };
-
-  const docRef = await addDoc(collection(db, 'conversations'), newConv);
-  return docRef.id;
 }
 
 /**

@@ -1,8 +1,8 @@
 .ch-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh; /* For mobile browsers */
+  height: 100%;
+  flex: 1;
   background: var(--paper);
 }
 
@@ -212,21 +212,19 @@
 }
 
 .ch-inbox-thumb {
-  width: 48px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   flex: none;
-  background: var(--placeholder);
-  border: 1.5px solid var(--ink);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 2px;
+  position: relative;
 }
 
-.ch-inbox-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.ch-inbox-thumb .ch-thumb-inner {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  background: var(--teal);
 }
 
 .ch-inbox-info {

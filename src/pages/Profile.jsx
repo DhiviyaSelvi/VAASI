@@ -5,6 +5,8 @@ import { getListingsBySeller, getPurchasedListings, markSold, updateListingPrice
 import { getMeetupInfoForListing } from '../services/chatService';
 import { checkPrice } from '../utils/pricing';
 import ConditionBadge from '../components/books/ConditionBadge';
+import ListingImage from '../components/common/ListingImage';
+import UserAvatar from '../components/common/UserAvatar';
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -160,21 +162,20 @@ export default function Profile() {
   return (
     <main className="pf-wrap">
       {/* Dev Switcher for thorough testing */}
-      <div className="pf-dev-user-select" style={{ justifyContent: 'space-between' }}>
+      <div className="pf-dev-user-select">
         {import.meta.env.DEV && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>Dev Switch Profile View:</span>
+          <div className="pf-dev-select-group">
+            <span className="pf-dev-label">Dev Switch Profile View:</span>
             <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
-              <option value="real">My Real Account (Google Auth + Firestore)</option>
-              <option value="user_101">Kavitha R (Mock: Active + Sold + Purchases)</option>
-              <option value="user_103">Deepak S (Mock: Zero Sales Test - 1 Purchase)</option>
-              <option value="user_105">Priya N (Mock: Zero Sales & Zero Purchases Test)</option>
+              <option value="real">Real Account (Google Auth)</option>
+              <option value="user_101">Kavitha R (Active + Sales)</option>
+              <option value="user_103">Deepak S (1 Purchase)</option>
+              <option value="user_105">Priya N (New Account)</option>
             </select>
           </div>
         )}
         <button 
           className="pf-signout-btn"
-          style={{ marginLeft: import.meta.env.DEV ? '0' : 'auto' }}
           onClick={async () => {
             await logoutUser();
             navigate('/login');
@@ -187,7 +188,7 @@ export default function Profile() {
       {/* Profile Card */}
       <div className="pf-card">
         <div className="pf-top">
-          <div className="pf-avatar">{initials}</div>
+          <UserAvatar name={currentUser?.name || 'User Profile'} size="medium" style={{ width: '48px', height: '48px', fontSize: '20px' }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="pf-name">{currentUser?.name || 'User Profile'}</div>
             <div className="pf-meta">
@@ -277,13 +278,13 @@ export default function Profile() {
               return (
                 <div key={item.id} className="pf-listing-row">
                   <div className="ph">
-                    {thumbnail ? (
-                      <img src={thumbnail} alt={item.title} />
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <rect x="4" y="3" width="16" height="18" />
-                      </svg>
-                    )}
+                    <ListingImage 
+                      src={thumbnail} 
+                      alt={item.title} 
+                      title={item.title} 
+                      fallbackIconSize={18} 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
                   </div>
                   <div className="pf-listing-info">
                     <div className="pf-listing-badges">
@@ -370,13 +371,13 @@ export default function Profile() {
               return (
                 <div key={item.id} className="pf-listing-row">
                   <div className="ph">
-                    {thumbnail ? (
-                      <img src={thumbnail} alt={item.title} />
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <rect x="4" y="3" width="16" height="18" />
-                      </svg>
-                    )}
+                    <ListingImage 
+                      src={thumbnail} 
+                      alt={item.title} 
+                      title={item.title} 
+                      fallbackIconSize={18} 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
                   </div>
                   <div className="pf-listing-info">
                     <div className="pf-listing-badges">
@@ -422,13 +423,13 @@ export default function Profile() {
               return (
                 <div key={item.id} className="pf-listing-row">
                   <div className="ph">
-                    {thumbnail ? (
-                      <img src={thumbnail} alt={item.title} />
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <rect x="4" y="3" width="16" height="18" />
-                      </svg>
-                    )}
+                    <ListingImage 
+                      src={thumbnail} 
+                      alt={item.title} 
+                      title={item.title} 
+                      fallbackIconSize={18} 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
                   </div>
                   <div className="pf-listing-info">
                     <div className="pf-listing-badges">

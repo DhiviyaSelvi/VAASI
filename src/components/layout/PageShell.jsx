@@ -5,26 +5,27 @@ import BottomNav from './BottomNav';
 
 /**
  * PageShell Layout Wrapper
- * - Hides Header & BottomNav on /login.
- * - Hides BottomNav on /book/:id (replaced by fixed action bar).
- * - Below 860px (mobile), hides Header on /book/:id (replaced by top back bar).
+ * - Persistent BottomNav on main tab routes (/ , /sell, /chat, /profile).
+ * - Hides BottomNav on secondary routes (/login, /book/:id, /chat/:id).
  */
 export default function PageShell() {
   const location = useLocation();
+  const isMainTab = ['/', '/sell', '/chat', '/profile'].includes(location.pathname);
+
   const isLoginPage = location.pathname === '/login';
   const isBookDetail = location.pathname.startsWith('/book/');
   const isSellPage = location.pathname === '/sell';
-  const isChatPage = location.pathname.startsWith('/chat/');
+  const isChatDetail = location.pathname.startsWith('/chat/');
 
   return (
-    <div className={`app-container ${isBookDetail ? 'is-book-detail-page' : ''} ${isSellPage ? 'is-sell-page' : ''} ${isChatPage ? 'is-chat-page' : ''}`}>
-      {!isLoginPage && <Header isBookDetail={isBookDetail} isSellPage={isSellPage} isChatPage={isChatPage} />}
+    <div className={`app-container ${isBookDetail ? 'is-book-detail-page' : ''} ${isSellPage ? 'is-sell-page' : ''} ${isChatDetail ? 'is-chat-page' : ''}`}>
+      {!isLoginPage && <Header isBookDetail={isBookDetail} isSellPage={isSellPage} isChatPage={isChatDetail} />}
       
-      <main className="main-content">
+      <main className={`main-content ${isMainTab ? 'has-bottom-nav' : ''}`}>
         <Outlet />
       </main>
 
-      {!isLoginPage && !isBookDetail && !isSellPage && !isChatPage && <BottomNav />}
+      {isMainTab && <BottomNav />}
     </div>
   );
 }

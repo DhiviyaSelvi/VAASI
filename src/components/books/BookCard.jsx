@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ConditionBadge from './ConditionBadge';
+import ListingImage from '../common/ListingImage';
+import UserAvatar from '../common/UserAvatar';
 
 export default function BookCard({ listing, distance = '1.2 km' }) {
   if (!listing) return null;
 
-  const hasPhoto = listing.photoUrls && listing.photoUrls.length > 0 && listing.photoUrls[0];
   const showDistance = listing.distance || distance;
+  const photoUrl = listing.photoUrls && listing.photoUrls.length > 0 ? listing.photoUrls[0] : null;
+  const sellerFirstName = (listing.sellerName || 'Seller').trim().split(' ')[0];
 
   return (
     <Link to={`/book/${listing.id}`} className="card">
@@ -16,17 +19,12 @@ export default function BookCard({ listing, distance = '1.2 km' }) {
       </div>
 
       <div className="photo">
-        {hasPhoto ? (
-          <img src={listing.photoUrls[0]} alt={listing.title} />
-        ) : (
-          <>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
-              <path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5z" />
-              <path d="M12 6v13.5" />
-            </svg>
-            Secondhand Copy
-          </>
-        )}
+        <ListingImage 
+          src={photoUrl} 
+          alt={listing.title} 
+          title={listing.title} 
+          fallbackIconSize={20}
+        />
       </div>
 
       <div className="card-body">
@@ -39,7 +37,10 @@ export default function BookCard({ listing, distance = '1.2 km' }) {
           <span className="price">₹{listing.price}</span>
           {listing.mrp && <span className="mrp">₹{listing.mrp}</span>}
         </div>
-        <div className="loc">{listing.locality}</div>
+        <div className="seller-meta" style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
+          <UserAvatar name={sellerFirstName} size="small" />
+          <span className="loc" style={{ margin: 0 }}>{sellerFirstName} · {listing.locality || 'Peelamedu'}</span>
+        </div>
       </div>
     </Link>
   );

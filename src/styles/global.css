@@ -9,6 +9,9 @@
 
 html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -16,7 +19,6 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  padding-bottom: 76px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -42,28 +44,29 @@ a {
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .main-content {
   flex: 1;
+  overflow-y: auto;
   max-width: var(--max-width-content);
   width: 100%;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 16px 24px;
 }
 
 @media (min-width: 860px) {
-  body {
-    padding-bottom: 40px;
-  }
   .main-content {
-    padding: 0 32px;
+    padding: 0 32px 32px;
   }
 }
 
 /* Header */
 .site-header {
+  flex-shrink: 0;
   background: var(--paper);
   border-bottom: 3px solid var(--ink);
   padding: 12px 16px 10px;
@@ -71,8 +74,6 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  position: sticky;
-  top: 0;
   z-index: 20;
 }
 
@@ -510,15 +511,11 @@ a {
 
 /* Bottom nav (mobile) */
 .bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 30;
+  flex-shrink: 0;
   background: var(--paper);
   border-top: 2px solid var(--ink);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
 }
 
@@ -543,11 +540,7 @@ a {
   box-shadow: 2px 2px 0 var(--ink);
 }
 
-@media (min-width: 860px) {
-  .bottom-nav {
-    display: none;
-  }
-}
+
 
 /* Placeholder card and shell fallback styling */
 .placeholder-page {

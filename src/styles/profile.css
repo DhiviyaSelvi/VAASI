@@ -308,20 +308,39 @@
   margin: 0 0 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   font-size: 11px;
   font-weight: 600;
   background: var(--marigold-tint);
   border: 1.5px solid var(--marigold);
   padding: 8px 12px;
   border-radius: 2px;
+  min-width: 0;
+}
+
+.pf-dev-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pf-dev-label {
+  white-space: nowrap;
 }
 
 .pf-dev-user-select select {
   font: inherit;
-  padding: 2px 6px;
+  padding: 4px 6px;
   border: 1px solid var(--ink);
   background: #fff;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .pf-signout-btn {
@@ -333,6 +352,8 @@
   color: var(--ink);
   cursor: pointer;
   border-radius: 2px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .pf-signout-btn:hover {

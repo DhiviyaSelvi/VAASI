@@ -1,8 +1,7 @@
 .sl-page {
   background: var(--paper); color: var(--ink);
   font-family: var(--font-body); -webkit-font-smoothing: antialiased;
-  padding-bottom: 110px;
-  min-height: 100vh;
+  padding-bottom: 24px;
 }
 .sl-page h1, .sl-page h2 { font-family: var(--font-display); margin: 0; }
 .sl-page button { font-family: inherit; cursor: pointer; }
